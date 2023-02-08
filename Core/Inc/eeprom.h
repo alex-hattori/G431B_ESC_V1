@@ -2,7 +2,7 @@
  * eeprom.h
  *
  *  Created on: 13 déc. 2020
- *      Author: Patrick
+ *      Author: Patrick, Alex
  */
 
 #ifndef INC_EEPROM_H_

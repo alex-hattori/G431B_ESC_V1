@@ -10,10 +10,10 @@
 
 void store_eeprom_regs()
 {
-	eeprom_store(__float_reg, 64, __int_reg, 256);
+	eeprom_store(__float_reg, FLOAT_REG_LEN, __int_reg, INT_REG_LEN);
 }
 
 void load_eeprom_regs()
 {
-	eeprom_restore(__float_reg, 64, __int_reg, 256);
+	eeprom_restore(__float_reg, FLOAT_REG_LEN, __int_reg, INT_REG_LEN);
 }

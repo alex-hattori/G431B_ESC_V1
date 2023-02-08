@@ -229,32 +229,6 @@ void USART2_IRQHandler(void)
   char c = Serial2RxBuffer[0];
 //  update_fsm(&state, c);
   printf("%c\r\n",c);
-  if(c=='r'){
-	  load_eeprom_regs();
-  }
-  else if(c=='z'){
-	  for(int i = 0; i<64; i++)
-	  {
-		  __float_reg[i] = (float)i;
-	  }
-	  for(int i = 0; i<256; i++)
-	  {
-		  __int_reg[i] = i;
-	  }
-	  store_eeprom_regs();
-  }
-  else if(c=='m'){
-	  I_BW = 7.0f;
-	  __int_reg[27] = 42;
-	  store_eeprom_regs();
-  }
-  else{
-	  I_BW = 2.0f;
-	  store_eeprom_regs();
-  }
-
-
-
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */

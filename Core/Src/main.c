@@ -48,8 +48,8 @@
 
 /* USER CODE BEGIN PV */
 uint8_t Serial2RxBuffer[1];
-float __float_reg[64];
-int __int_reg[256];
+float __float_reg[FLOAT_REG_LEN];
+int __int_reg[INT_REG_LEN];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -96,31 +96,7 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
-  printf("Beans\r\n");
   load_eeprom_regs();
-//  I_BW = 1.0f;
-//  I_MAX = 2.0f;
-//  THETA_MIN = 3.0f;
-//  THETA_MAX = 4.0f;
-//  I_FW_MAX = 5.0f;
-//  R_NOMINAL = 6.0f;
-//  TEMP_MAX = 7.0f;
-//  I_MAX_CONT = 8.0f;
-//  PPAIRS = 9.0f;
-//  R_PHASE = 10.0f;
-//  KT = 11.0f;
-//  R_TH = 12.0f;
-//  C_TH = 13.0f;
-//  GR = 14.0f;
-//  I_CAL = 15.0f;
-//  P_MIN = 16.0f;
-//  P_MAX = 17.0f;
-//  V_MIN = 18.0f;
-//  V_MAX = 19.0f;
-//  KP_MAX = 20.0f;
-//  KD_MAX = 21.0f;
-//  store_eeprom_regs();
-  printf("Finished\r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */

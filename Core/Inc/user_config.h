@@ -39,11 +39,11 @@ extern "C" {
 #define E_ZERO					__int_reg[5]
 #define ENCODER_LUT             __int_reg[6]                                    // Encoder offset LUT - 128 elements long
 
+#define FLOAT_REG_LEN 64
+#define INT_REG_LEN 256
 
-//void factory_reset_eeprom_regs();
 void load_eeprom_regs();
 void store_eeprom_regs();
-//void reset_ram_regs();
 
 extern float __float_reg[];
 extern int __int_reg[];
