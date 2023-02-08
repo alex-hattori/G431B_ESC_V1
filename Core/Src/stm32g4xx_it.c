@@ -237,10 +237,15 @@ void USART2_IRQHandler(void)
 	  {
 		  __float_reg[i] = (float)i;
 	  }
+	  for(int i = 0; i<256; i++)
+	  {
+		  __int_reg[i] = i;
+	  }
 	  store_eeprom_regs();
   }
   else if(c=='m'){
 	  I_BW = 7.0f;
+	  __int_reg[27] = 42;
 	  store_eeprom_regs();
   }
   else{

@@ -8,8 +8,8 @@
 #include "eeprom.h"
 #include <string.h>
 
-static uint32_t const page_nb = 63U; //(uint32_t)FLASH_PAGE_NB-1;
-static uint32_t const start_address = 0x08000000UL+63*0x800U; //(FLASH_BASE)+page_nb*(FLASH_PAGE_SIZE);
+static uint32_t const page_nb = 58U; //(uint32_t)FLASH_PAGE_NB-1;
+static uint32_t const start_address = 0x08000000UL+58*0x800U; //(FLASH_BASE)+page_nb*(FLASH_PAGE_SIZE);
 
 uint8_t const * eeprom_base_address()
 {
@@ -39,6 +39,21 @@ HAL_StatusTypeDef eeprom_restore(float * float_regs, uint32_t float_size, int * 
 		printf("Load %i %f\r\n",index+1, value2);
 		float_regs[index+1] = value2;
 	}
+	for(uint32_t index=0; index<int_size;index+=2) // 64 bits
+	{
+
+		memcpy(&data, start_address+32*(index+float_size), sizeof(uint64_t));
+		uint32_t temp = data&0xFFFFFFFF;
+		uint32_t temp2 = data>>32;
+		int value;
+		int value2;
+		memcpy(&value,&temp,sizeof(uint32_t));
+		memcpy(&value2,&temp2,sizeof(uint32_t));
+		printf("Load %i %i\r\n",index, value);
+		int_regs[index] = value;
+		printf("Load %i %i\r\n",index+1, value2);
+		int_regs[index+1] = value2;
+	}
 
 	return HAL_OK;
 }
@@ -48,13 +63,7 @@ HAL_StatusTypeDef eeprom_store(float const * float_regs, uint32_t float_size, in
 	HAL_FLASH_Unlock();
 	// erase the last page of bank1 (STM32G43x : 1 bank, 64 pages, 2kB per page, 64-bit data)
 	{
-		FLASH_EraseInitTypeDef erase =
-			{
-				FLASH_TYPEERASE_PAGES,
-				FLASH_BANK_1,
-				page_nb,
-				1
-			};
+		FLASH_EraseInitTypeDef erase ={FLASH_TYPEERASE_PAGES,FLASH_BANK_1,page_nb,5};
 		uint32_t page_error = 0;
 		HAL_StatusTypeDef result = HAL_FLASHEx_Erase(&erase, &page_error);
 		if(result!=HAL_OK)
@@ -77,6 +86,33 @@ HAL_StatusTypeDef eeprom_store(float const * float_regs, uint32_t float_size, in
 			uint64_t temp3 = temp2;
 			data = (temp3<<32)|temp;
 			HAL_StatusTypeDef result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD,start_address+index*32,data);
+			if(result!=HAL_OK)
+			{
+				printf("Error\r\n");
+				uint32_t error = HAL_FLASH_GetError();
+				if(error)
+				{
+					HAL_FLASH_Lock();
+					return error;
+				}
+				HAL_FLASH_Lock();
+				return result;
+			}
+		}
+		for(uint32_t index=0; index<int_size;index+=2) // 64 bits
+		{
+			printf("Write %d %i\r\n",(int)index, int_regs[index]);
+			printf("Write %d %i\r\n",(int)index+1, int_regs[index+1]);
+			uint32_t temp;
+			uint32_t temp2;
+			union UN {int a; uint32_t b;};
+			union UN un1;
+			union UN un2;
+			un1.a = int_regs[index];
+			un2.a = int_regs[index+1];
+			uint64_t temp3 = un2.b;
+			data = (temp3<<32)|un1.b;
+			HAL_StatusTypeDef result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD,start_address+(float_size+index)*32,data);
 			if(result!=HAL_OK)
 			{
 				printf("Error\r\n");
