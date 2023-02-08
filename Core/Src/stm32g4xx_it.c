@@ -232,6 +232,13 @@ void USART2_IRQHandler(void)
   if(c=='r'){
 	  load_eeprom_regs();
   }
+  else if(c=='z'){
+	  for(int i = 0; i<64; i++)
+	  {
+		  __float_reg[i] = (float)i;
+	  }
+	  store_eeprom_regs();
+  }
   else if(c=='m'){
 	  I_BW = 7.0f;
 	  store_eeprom_regs();

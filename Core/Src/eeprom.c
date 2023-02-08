@@ -21,29 +21,29 @@ bool eeprom_empty()
 	return *(uint32_t*)(start_address)==0xFFFFFFFF;
 }
 
-HAL_StatusTypeDef eeprom_restore(float * regs, uint32_t size)
+HAL_StatusTypeDef eeprom_restore(float * float_regs, uint32_t float_size, int * int_regs, uint32_t int_size)
 {
 	uint64_t data = 0xDEADBEEF;
-	for(uint32_t index=0; index<size;index++) // 64 bits
+	for(uint32_t index=0; index<float_size;index+=2) // 64 bits
 	{
 
-		memcpy(&data, start_address+64*index, sizeof(uint64_t));
-		uint32_t temp = data & 0xFFFFFFFF;
+		memcpy(&data, start_address+32*index, sizeof(uint64_t));
+		uint32_t temp = data&0xFFFFFFFF;
+		uint32_t temp2 = data>>32;
 		float value;
+		float value2;
 		memcpy(&value,&temp,sizeof(uint32_t));
+		memcpy(&value2,&temp2,sizeof(uint32_t));
 		printf("Load %i %f\r\n",index, value);
-		regs[index] = value;
+		float_regs[index] = value;
+		printf("Load %i %f\r\n",index+1, value2);
+		float_regs[index+1] = value2;
 	}
-//	memcpy(regs,(float const*)start_address,size*64);
-//	printf("Beans\r\n");
-//	for(uint32_t index=0; index<size;index+=2) // 64 bits
-//	{
-//		printf("Loaded %d %f %f\r\n",index, regs[index], regs[index+1]);
-//	}
+
 	return HAL_OK;
 }
 
-HAL_StatusTypeDef eeprom_store(float const * regs, uint32_t size)
+HAL_StatusTypeDef eeprom_store(float const * float_regs, uint32_t float_size, int const * int_regs, uint32_t int_size)
 {
 	HAL_FLASH_Unlock();
 	// erase the last page of bank1 (STM32G43x : 1 bank, 64 pages, 2kB per page, 64-bit data)
@@ -66,13 +66,17 @@ HAL_StatusTypeDef eeprom_store(float const * regs, uint32_t size)
 	// write the last page
 	{
 		uint64_t data = 0xDEADBEEF;
-		for(uint32_t index=0; index<size;index++) // 64 bits
+		for(uint32_t index=0; index<float_size;index+=2) // 64 bits
 		{
-			printf("Write %d %f\r\n",(int)index, regs[index]);
+			printf("Write %d %f\r\n",(int)index, float_regs[index]);
+			printf("Write %d %f\r\n",(int)index+1, float_regs[index+1]);
 			uint32_t temp;
-			memcpy(&temp,&regs[index],sizeof(uint64_t));
-			data = temp;
-			HAL_StatusTypeDef result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD,start_address+index*64,data);
+			uint32_t temp2;
+			memcpy(&temp,&float_regs[index],sizeof(uint32_t));
+			memcpy(&temp2,&float_regs[index+1],sizeof(uint32_t));
+			uint64_t temp3 = temp2;
+			data = (temp3<<32)|temp;
+			HAL_StatusTypeDef result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD,start_address+index*32,data);
 			if(result!=HAL_OK)
 			{
 				printf("Error\r\n");
