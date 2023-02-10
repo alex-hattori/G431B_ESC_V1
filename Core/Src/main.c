@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -93,7 +94,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
-  MX_TIM2_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
   load_eeprom_regs();
@@ -107,6 +108,22 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 //	printf("Beans %.3f\r\n",3.14f);
+	uint16_t i2cAddr = (0x36 & 0x7f) <<1;
+	typedef union
+	{
+	    volatile uint16_t      raw;
+	    struct
+	    {
+	        volatile uint16_t      angle8_12     :   4;
+	        volatile uint16_t      notused       :   4;
+	        volatile uint16_t      angle0_7      :   8;
+	    } bit;
+	} angle_reg_t;
+	angle_reg_t data;
+	data.raw = 0;
+	HAL_I2C_Mem_Read(&hi2c1, i2cAddr,0x0C,I2C_MEMADD_SIZE_8BIT,(uint8_t*)&data.raw, 2,2);
+	uint16_t angle = ((data.bit.angle8_12<<8)&0xF00)|data.bit.angle0_7;
+	printf("%d\r\n",angle);
 	HAL_Delay(100);
   }
   /* USER CODE END 3 */
@@ -156,8 +173,9 @@ void SystemClock_Config(void)
   }
   /** Initializes the peripherals clocks
   */
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
