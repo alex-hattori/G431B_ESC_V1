@@ -27,6 +27,14 @@
 #include "usart.h"
 #include "gpio.h"
 #include "user_config.h"
+#include "hw_config.h"
+#include "structs.h"
+#include "fsm.h"
+#include "i2c.h"
+#include "adc.h"
+#include "foc.h"
+#include "fdcan.h"
+#include "position_sensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,6 +68,11 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_adc1;
+extern DMA_HandleTypeDef hdma_adc2;
+extern ADC_HandleTypeDef hadc1;
+extern ADC_HandleTypeDef hadc2;
+extern FDCAN_HandleTypeDef hfdcan1;
 extern TIM_HandleTypeDef htim1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
@@ -205,19 +218,103 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles DMA1 channel1 global interrupt.
+  */
+void DMA1_Channel1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc1);
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel2 global interrupt.
+  */
+void DMA1_Channel2_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel2_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc2);
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles ADC1 and ADC2 global interrupt.
+  */
+void ADC1_2_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC1_2_IRQn 0 */
+
+  /* USER CODE END ADC1_2_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc1);
+  HAL_ADC_IRQHandler(&hadc2);
+  /* USER CODE BEGIN ADC1_2_IRQn 1 */
+
+  /* USER CODE END ADC1_2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles FDCAN1 interrupt 0.
+  */
+void FDCAN1_IT0_IRQHandler(void)
+{
+  /* USER CODE BEGIN FDCAN1_IT0_IRQn 0 */
+
+  /* USER CODE END FDCAN1_IT0_IRQn 0 */
+  HAL_FDCAN_IRQHandler(&hfdcan1);
+  /* USER CODE BEGIN FDCAN1_IT0_IRQn 1 */
+//  HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
+//  uint32_t TxMailbox;
+//  pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR);	// Pack response
+//  HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
+//
+//  /* Check for special Commands */
+//  if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) & (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFC))){
+//	  update_fsm(&state, MOTOR_CMD);
+//      }
+//  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFD))){
+//      update_fsm(&state, MENU_CMD);
+//      }
+//  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFE))){
+//	  update_fsm(&state, ZERO_CMD);
+//      }
+//  else{
+//	  unpack_cmd(can_rx, controller.commands);	// Unpack commands
+//	  controller.timeout = 0;					// Reset timeout counter
+//  }
+  /* USER CODE END FDCAN1_IT0_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM1 update interrupt and TIM16 global interrupt.
   */
 void TIM1_UP_TIM16_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM16_IRQn 0 */
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET );	// Useful for timing
-	for(int i = 0; i<255; i++){
-		int j = i+1;
-	}
+	HAL_GPIO_WritePin(PWM_PIN, GPIO_PIN_RESET );	// Useful for timing
+	analog_sample(&controller);
+
+	/* Sample position sensor */
+	ps_sample(&comm_encoder, DT);
+//	  HAL_GPIO_WritePin(LoopTime, GPIO_PIN_SET );
+
+	/* Run Finite State Machine */
+	run_fsm(&state);
+
+	/* increment loop count */
+	controller.loop_count++;
+
   /* USER CODE END TIM1_UP_TIM16_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM16_IRQn 1 */
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET );	// Useful for timing
+	HAL_GPIO_WritePin(PWM_PIN, GPIO_PIN_SET );	// Useful for timing
 
   /* USER CODE END TIM1_UP_TIM16_IRQn 1 */
 }
@@ -231,18 +328,7 @@ void USART2_IRQHandler(void)
   HAL_UART_IRQHandler(&huart2);
 
   char c = Serial2RxBuffer[0];
-//  update_fsm(&state, c);
-  printf("%c\r\n",c);
-  if(c=='m'){
-	  htim1.Instance->CCR1 = ((htim1.Instance->ARR))*(0.5f); //U
-	  htim1.Instance->CCR2 = ((htim1.Instance->ARR))*(0.8f); //V
-	  htim1.Instance->CCR3 = ((htim1.Instance->ARR))*(0.1f); //W
-  }
-  if(c==27){
-	htim1.Instance->CCR3 = ((htim1.Instance->ARR))*(0.0f);
-	htim1.Instance->CCR1 = ((htim1.Instance->ARR))*(0.0f);
-	htim1.Instance->CCR2 = ((htim1.Instance->ARR))*(0.0f);
-  }
+  update_fsm(&state, c);
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */

@@ -19,7 +19,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
+#include "fdcan.h"
 #include "i2c.h"
+#include "opamp.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -29,6 +33,14 @@
 #include <stdio.h>
 #include <string.h>
 #include "user_config.h"
+#include "hw_config.h"
+#include "structs.h"
+#include "position_sensor.h"
+#include "fsm.h"
+#include "gatedrive.h"
+#include "foc.h"
+#include "math_ops.h"
+#include "calibration.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,12 +54,29 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define VERSION_NUM 1.0f
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+/* Structs for control, etc */
+
+ControllerStruct controller;
+ObserverStruct observer;
+COMStruct com;
+FSMStruct state;
+EncoderStruct comm_encoder;
+CalStruct comm_encoder_cal;
+CANTxMessage can_tx;
+CANRxMessage can_rx;
+
+ControllerStruct dummy;
+
+/* init but don't allocate calibration arrays */
+int *error_array = NULL;
+int *lut_array = NULL;
+
 uint8_t Serial2RxBuffer[1];
 float __float_reg[FLOAT_REG_LEN];
 int __int_reg[INT_REG_LEN];
@@ -92,24 +121,122 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
   MX_I2C1_Init();
+  MX_OPAMP1_Init();
+  MX_OPAMP2_Init();
+  MX_OPAMP3_Init();
+  MX_ADC1_Init();
+  MX_ADC2_Init();
+  MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
   load_eeprom_regs();
+  /* Sanitize configs in case flash is empty*/
+  if(E_ZERO==-1){E_ZERO = 0;}
+  if(M_ZERO==-1){M_ZERO = 0;}
+  if(isnan(I_BW) || I_BW==-1){I_BW = 1000;}
+  if(isnan(I_MAX) || I_MAX ==-1){I_MAX=40;}
+  if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=0;}
+  if(CAN_ID==-1){CAN_ID = 1;}
+  if(CAN_MASTER==-1){CAN_MASTER = 0;}
+  if(CAN_TIMEOUT==-1){CAN_TIMEOUT = 0;}
+  if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
+  if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
+  if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
+  if(isnan(I_CAL)||I_CAL==-1){I_CAL = 5.0f;}
+  if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
+  if(isnan(GR) || GR==-1){GR = 1.0f;}
+  if(isnan(KT) || KT==-1){KT = 1.0f;}
+  if(isnan(KP_MAX) || KP_MAX==-1){KP_MAX = 500.0f;}
+  if(isnan(KD_MAX) || KD_MAX==-1){KD_MAX = 5.0f;}
+  if(isnan(P_MAX)){P_MAX = 12.5f;}
+  if(isnan(P_MIN)){P_MIN = -12.5f;}
+  if(isnan(V_MAX)){V_MAX = 200.0f;}
+  if(isnan(V_MIN)){V_MIN = -200.0f;}
+  if(isnan(MECH_ZERO)){MECH_ZERO = 0.0f;}
+  if(isnan(T_MAX)){T_MAX = 10.0f;}
+
+  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
+/* Controller Setup */
+init_controller_params(&controller);
+
+/* calibration "encoder" zeroing */
+memset(&comm_encoder_cal.cal_position, 0, sizeof(EncoderStruct));
+
+/* commutation encoder setup */
+comm_encoder.m_zero = M_ZERO;
+comm_encoder.e_zero = E_ZERO;
+comm_encoder.ppairs = PPAIRS;
+comm_encoder.mech_zero = MECH_ZERO;
+ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
+ps_sample(&comm_encoder, DT);
+ps_sample(&comm_encoder, DT);
+ps_sample(&comm_encoder, DT);
+if(comm_encoder.angle_multiturn[0]>PI_F){
+  comm_encoder.angle_multiturn[0]-=TWO_PI_F;
+  comm_encoder.turns--;
+  printf("Added\r\n");
+}
+else if(comm_encoder.angle_multiturn[0]<-PI_F){
+  comm_encoder.angle_multiturn[0] += TWO_PI_F;
+  comm_encoder.turns++;
+  printf("Subtracted\r\n");
+}
 
 
-  /* Turn on PWM */
-   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
-   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
-   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
-   htim1.Instance->CCR3 = ((htim1.Instance->ARR))*(0.0f);
-   htim1.Instance->CCR1 = ((htim1.Instance->ARR))*(0.0f);
-   htim1.Instance->CCR2 = ((htim1.Instance->ARR))*(0.0f);
+if(EN_ENC_LINEARIZATION){memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));}	// Copy the linearization lookup table
+else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
+
+/* Turn on ADCs */
+//   HAL_ADC_Start(&hadc1);
+//   HAL_Delay(10);
+//   HAL_ADC_Start(&hadc2);
+	HAL_OPAMP_Start(&hopamp1);
+	HAL_OPAMP_Start(&hopamp2);
+	HAL_OPAMP_Start(&hopamp3);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)controller.ADC1_Val, 2);
+	HAL_ADC_Start_DMA(&hadc2, (uint32_t *)controller.ADC2_Val, 2);
+
+   disable_gd(&controller);
+   HAL_Delay(10);
+
+   zero_current(&controller);
+   HAL_Delay(100);
+   printf("ADC A OFFSET: %d     ADC B OFFSET: %d     ADC C OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset, controller.adc_c_offset);
+
+   /* Turn on PWM */
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+      HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
+      HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
+
+      disable_gd(&controller);
+
+	  /* CAN setup */
+      HAL_GPIO_WritePin(CAN_SHDWN, GPIO_PIN_RESET); //Enable CAN
+      HAL_GPIO_WritePin(CAN_TERM, GPIO_PIN_RESET ); //Disable CAN termination resistor
+
+/*
+	  can_rx_init(&can_rx);
+	  can_tx_init(&can_tx);
+	  HAL_CAN_Start(&CAN_H); //start CAN
+	  __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING); // Start can interrupt  */
+
+	  /* Set Interrupt Priorities */
+	  NVIC_SetPriority(PWM_ISR, 1); // commutation > communication
+	  NVIC_SetPriority(CAN_ISR, 3);
+
+	  /* Start the FSM */
+	  state.state = MENU_MODE;
+	  state.next_state = MENU_MODE;
+	  state.ready = 1;
+
+
+  HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
    HAL_TIM_Base_Start_IT(&htim1);
   /* USER CODE END 2 */
 
@@ -120,23 +247,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	printf("Beans %.3f\r\n",3.14f);
-	uint16_t i2cAddr = (0x36 & 0x7f) <<1;
-	typedef union
-	{
-	    volatile uint16_t      raw;
-	    struct
-	    {
-	        volatile uint16_t      angle8_12     :   4;
-	        volatile uint16_t      notused       :   4;
-	        volatile uint16_t      angle0_7      :   8;
-	    } bit;
-	} angle_reg_t;
-	angle_reg_t data;
-	data.raw = 0;
-	HAL_I2C_Mem_Read(&hi2c1, i2cAddr,0x0C,I2C_MEMADD_SIZE_8BIT,(uint8_t*)&data.raw, 2,2);
-	uint16_t angle = ((data.bit.angle8_12<<8)&0xF00)|data.bit.angle0_7;
-	printf("%d\r\n",angle);
+//	printf("A:%f B:%f C:%f V:%f \r\n",controller.i_a, controller.i_b, controller.i_c, controller.v_bus);
+
 	HAL_Delay(100);
   }
   /* USER CODE END 3 */
@@ -177,8 +289,8 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
@@ -186,9 +298,12 @@ void SystemClock_Config(void)
   }
   /** Initializes the peripherals clocks
   */
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
+                              |RCC_PERIPHCLK_ADC12|RCC_PERIPHCLK_FDCAN;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+  PeriphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PCLK1;
+  PeriphClkInit.Adc12ClockSelection = RCC_ADC12CLKSOURCE_SYSCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();

@@ -1,2 +1,2 @@
-../Core/Src/eeprom.c:14:19:eeprom_restore	72	static
-../Core/Src/eeprom.c:46:19:eeprom_store	168	static
+eeprom.c:14:19:eeprom_restore	72	static
+eeprom.c:46:19:eeprom_store	136	static
