@@ -210,10 +210,14 @@ void SysTick_Handler(void)
 void TIM1_UP_TIM16_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM16_IRQn 0 */
-
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET );	// Useful for timing
+	for(int i = 0; i<255; i++){
+		int j = i+1;
+	}
   /* USER CODE END TIM1_UP_TIM16_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM16_IRQn 1 */
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET );	// Useful for timing
 
   /* USER CODE END TIM1_UP_TIM16_IRQn 1 */
 }
@@ -229,6 +233,16 @@ void USART2_IRQHandler(void)
   char c = Serial2RxBuffer[0];
 //  update_fsm(&state, c);
   printf("%c\r\n",c);
+  if(c=='m'){
+	  htim1.Instance->CCR1 = ((htim1.Instance->ARR))*(0.5f); //U
+	  htim1.Instance->CCR2 = ((htim1.Instance->ARR))*(0.8f); //V
+	  htim1.Instance->CCR3 = ((htim1.Instance->ARR))*(0.1f); //W
+  }
+  if(c==27){
+	htim1.Instance->CCR3 = ((htim1.Instance->ARR))*(0.0f);
+	htim1.Instance->CCR1 = ((htim1.Instance->ARR))*(0.0f);
+	htim1.Instance->CCR2 = ((htim1.Instance->ARR))*(0.0f);
+  }
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
