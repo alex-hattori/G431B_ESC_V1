@@ -43,7 +43,7 @@
 #define CAN_H			hfdcan1				// CAN handle
 
 /* Other hardware-related constants */
-#define I_SCALE 			0.02937818963f  // Amps per A/D Count - Not 100% sure. Assumes 64/7 gain, 0.003ohm shunt
+#define I_SCALE 			-0.02937818963f  // Amps per A/D Count - Not 100% sure. Assumes 64/7 gain, 0.003ohm shunt
 #define V_SCALE 			0.00837138508f    // Bus volts per A/D Count
 #define DTC_MAX 			0.94f          	// Max duty cycle
 #define DTC_MIN 			0.0f          	// Min duty cycle

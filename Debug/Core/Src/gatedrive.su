@@ -1,2 +1,2 @@
-gatedrive.c:11:6:enable_gd	16	static
-gatedrive.c:22:6:disable_gd	16	static
+../Core/Src/gatedrive.c:11:6:enable_gd	16	static
+../Core/Src/gatedrive.c:22:6:disable_gd	16	static

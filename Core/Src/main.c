@@ -205,7 +205,7 @@ else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
    zero_current(&controller);
    HAL_Delay(100);
    printf("ADC A OFFSET: %d     ADC B OFFSET: %d     ADC C OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset, controller.adc_c_offset);
-
+   printf("Vbus: %f\r\n",controller.v_bus);
    /* Turn on PWM */
       HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
       HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
@@ -248,8 +248,8 @@ else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
 
     /* USER CODE BEGIN 3 */
 //	printf("A:%f B:%f C:%f V:%f \r\n",controller.i_a, controller.i_b, controller.i_c, controller.v_bus);
-
-	HAL_Delay(100);
+//	  printf("%f\r\n",controller.i_d);
+//	HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
