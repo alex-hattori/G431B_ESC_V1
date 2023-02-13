@@ -71,6 +71,7 @@
 extern DMA_HandleTypeDef hdma_adc1;
 extern DMA_HandleTypeDef hdma_adc2;
 extern FDCAN_HandleTypeDef hfdcan1;
+extern DMA_HandleTypeDef hdma_i2c1_rx;
 extern TIM_HandleTypeDef htim1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
@@ -244,6 +245,20 @@ void DMA1_Channel2_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA1 channel3 global interrupt.
+  */
+void DMA1_Channel3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 1 */
+}
+
+/**
   * @brief This function handles FDCAN1 interrupt 0.
   */
 void FDCAN1_IT0_IRQHandler(void)
@@ -281,22 +296,19 @@ void FDCAN1_IT0_IRQHandler(void)
 void TIM1_UP_TIM16_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM16_IRQn 0 */
-//	HAL_GPIO_WritePin(PWM_PIN, GPIO_PIN_SET );	// Useful for timing
+	HAL_GPIO_WritePin(PWM_PIN, GPIO_PIN_SET );	// Useful for timing
 	analog_sample(&controller);
 	/* Sample position sensor */
 	ps_sample(&comm_encoder, DT);
-//	  HAL_GPIO_WritePin(LoopTime, GPIO_PIN_SET );
-
 	/* Run Finite State Machine */
 	run_fsm(&state);
-
 	/* increment loop count */
 	controller.loop_count++;
 
   /* USER CODE END TIM1_UP_TIM16_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM16_IRQn 1 */
-//	HAL_GPIO_WritePin(PWM_PIN, GPIO_PIN_RESET );	// Useful for timing
+	HAL_GPIO_WritePin(PWM_PIN, GPIO_PIN_RESET );	// Useful for timing
   /* USER CODE END TIM1_UP_TIM16_IRQn 1 */
 }
 
