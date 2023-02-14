@@ -6,16 +6,18 @@ Serial
 
 Flash
 
-
-**Todo:**
-
 Encoder
 
 PWM
 
 Current Sense
 
-CAN
-
 State Machine
+
+FOC (15khz)
+
+
+**Todo:**
+
+CAN
 
