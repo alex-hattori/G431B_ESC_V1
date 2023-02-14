@@ -37,9 +37,9 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
 	//memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
 
-	/* I2C read/write */
-//	encoder->data.raw = 0;
-//	HAL_I2C_Mem_Read(&ENC_I2C, ENC_ADDRESS,0x0C,I2C_MEMADD_SIZE_8BIT,(uint8_t*)&encoder->data.raw, 2,2);
+	/* SPI read/write */
+	encoder->data.raw = 0;
+	HAL_I2C_Mem_Read(&ENC_I2C, ENC_ADDRESS,0x0C,I2C_MEMADD_SIZE_8BIT,(uint8_t*)&encoder->data.raw, 2,2);
 	uint16_t angle = ((encoder->data.bit.angle8_12<<8)&0xF00)|encoder->data.bit.angle0_7;
 	encoder->raw = angle;
 
@@ -78,7 +78,6 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	encoder->velocity = (encoder->angle_multiturn[0] - encoder->angle_multiturn[N_POS_SAMPLES-1])/(dt*(float)(N_POS_SAMPLES-1));
 	encoder->elec_velocity = encoder->ppairs*encoder->velocity;
-	HAL_I2C_Mem_Read_DMA(&ENC_I2C, ENC_ADDRESS,0x0C,I2C_MEMADD_SIZE_8BIT,(uint8_t*)&encoder->data.raw, 2);
 
 }
 
