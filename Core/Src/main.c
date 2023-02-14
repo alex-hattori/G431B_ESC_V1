@@ -248,8 +248,8 @@ else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
 
     /* USER CODE BEGIN 3 */
 //	printf("A:%f B:%f C:%f V:%f \r\n",controller.i_a, controller.i_b, controller.i_c, controller.v_bus);
-//	  printf("%f\r\n",controller.i_d);
-//	HAL_Delay(100);
+//	  printf("%f %f\r\n",controller.i_q, controller.i_q_des);
+	HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
