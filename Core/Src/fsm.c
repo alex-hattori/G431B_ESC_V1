@@ -46,7 +46,7 @@
 				 /* Exit calibration mode when done */
 				 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
 				 E_ZERO = comm_encoder_cal.ezero;
-				 printf("E_ZERO: %d  PP: %.3f %f\r\n", E_ZERO, comm_encoder.ppairs, TWO_PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
+				 printf("E_ZERO: %d  PP: %.3f %f\r\n", E_ZERO, PPAIRS, TWO_PI_F*fmodf((PPAIRS*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
 				 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
 				 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
 				 //for(int i = 0; i<128; i++){printf("%d\r\n", ENCODER_LUT[i]);}

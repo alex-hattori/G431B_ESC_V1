@@ -12,15 +12,15 @@
 #include "user_config.h"
 
 void ps_warmup(EncoderStruct * encoder, int n){
-//	encoder->config.raw = 0;
-//	encoder->config.bit.PM = 0;
-//	encoder->config.bit.HYST = 0;
-//	encoder->config.bit.OUTS = 0;
-//	encoder->config.bit.PWMF = 0;
-//	encoder->config.bit.SF = 3;
-//	encoder->config.bit.FTH = 7;
-//	encoder->config.bit.WD = 0;
-//	HAL_I2C_Mem_Write(&ENC_I2C, ENC_ADDRESS,0x01,I2C_MEMADD_SIZE_8BIT, (uint8_t*)&encoder->config.raw, 2,2);
+	encoder->config.raw = 0;
+	encoder->config.bit.PM = 0;
+	encoder->config.bit.HYST = 0;
+	encoder->config.bit.OUTS = 0;
+	encoder->config.bit.PWMF = 0;
+	encoder->config.bit.SF = 3;
+	encoder->config.bit.FTH = 7;
+	encoder->config.bit.WD = 0;
+	HAL_I2C_Mem_Write(&ENC_I2C, ENC_ADDRESS,0x01,I2C_MEMADD_SIZE_8BIT, (uint8_t*)&encoder->config.raw, 2,2);
 	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
 	for(int i = 0; i<n; i++){
 		encoder->data.raw = 0;
@@ -39,7 +39,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	/* SPI read/write */
 	encoder->data.raw = 0;
-	HAL_I2C_Mem_Read(&ENC_I2C, ENC_ADDRESS,0x0C,I2C_MEMADD_SIZE_8BIT,(uint8_t*)&encoder->data.raw, 2,2);
+	HAL_I2C_Master_Receive(&ENC_I2C, ENC_ADDRESS,(uint8_t*)&encoder->data.raw, 2,2);
 	uint16_t angle = ((encoder->data.bit.angle8_12<<8)&0xF00)|encoder->data.bit.angle0_7;
 	encoder->raw = angle;
 
