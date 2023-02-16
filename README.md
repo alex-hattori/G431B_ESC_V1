@@ -18,10 +18,11 @@ FOC (15khz)
 
 CAN
 
+Mosfet temperature sense
+
 
 **Next Steps**
 
-Increase loop frequency
+Increase loop frequency - Need to check actual loop frequency
 
-Mosfet temperature sense
 
