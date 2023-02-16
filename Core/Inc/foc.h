@@ -47,8 +47,9 @@ typedef struct{
     uint8_t invert_dtc;										// Inverter duty cycle inverting/non-inverting
     uint8_t isEnabled;
     int temp_raw;
-    uint16_t ADC1_Val[2];
+    uint16_t ADC1_Val[3];
     uint16_t ADC2_Val[2];
+    float fet_temp_C;
     } ControllerStruct;
 
 typedef struct{

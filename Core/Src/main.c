@@ -99,39 +99,39 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-	/* USER CODE BEGIN 1 */
+  /* USER CODE BEGIN 1 */
 
-	/* USER CODE END 1 */
+  /* USER CODE END 1 */
 
-	/* MCU Configuration--------------------------------------------------------*/
+  /* MCU Configuration--------------------------------------------------------*/
 
-	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-	HAL_Init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-	/* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 
-	/* USER CODE END Init */
+  /* USER CODE END Init */
 
-	/* Configure the system clock */
-	SystemClock_Config();
+  /* Configure the system clock */
+  SystemClock_Config();
 
-	/* USER CODE BEGIN SysInit */
+  /* USER CODE BEGIN SysInit */
 	HAL_Delay(100);
-	/* USER CODE END SysInit */
+  /* USER CODE END SysInit */
 
-	/* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_DMA_Init();
-	MX_USART2_UART_Init();
-	MX_TIM1_Init();
-	MX_I2C1_Init();
-	MX_OPAMP1_Init();
-	MX_OPAMP2_Init();
-	MX_OPAMP3_Init();
-	MX_ADC1_Init();
-	MX_ADC2_Init();
-	MX_FDCAN1_Init();
-	/* USER CODE BEGIN 2 */
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_USART2_UART_Init();
+  MX_TIM1_Init();
+  MX_I2C1_Init();
+  MX_OPAMP1_Init();
+  MX_OPAMP2_Init();
+  MX_OPAMP3_Init();
+  MX_ADC1_Init();
+  MX_ADC2_Init();
+  MX_FDCAN1_Init();
+  /* USER CODE BEGIN 2 */
 	load_eeprom_regs();
 	/* Sanitize configs in case flash is empty*/
 	if(E_ZERO==-1){E_ZERO = 0;}
@@ -242,8 +242,17 @@ int main(void)
     /* USER CODE BEGIN 3 */
 //	printf("A:%f B:%f C:%f V:%f \r\n",controller.i_a, controller.i_b, controller.i_c, controller.v_bus);
 //	  printf("%f %f\r\n",controller.i_q, controller.i_q_des);
-
-	HAL_Delay(100);
+		static float const R60 = 4700.0f; // ohm
+		static float const eps = 0.1f; // epsilon (avoid divide by zero)
+		float const R_NTC = R60*(4096.0f/(controller.ADC1_Val[2]+eps)-1.0f); // 10kohm NTC at 25°C
+		static float const Beta = 3455.0f; // for a 10k NTC
+		static float const Kelvin = 273.15f; //°C
+		static float const T0 = 273.15f + 25.0f;
+		static float const R0 = 10000.0f; // 10kohm at 25° for 10k NTC
+		float const present_temperature_K = Beta * T0 / ( Beta - T0*logf(R0/R_NTC) );
+		controller.fet_temp_C = present_temperature_K-Kelvin;
+		printf("%f\r\n",controller.fet_temp_C);
+		HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }

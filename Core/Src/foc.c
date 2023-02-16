@@ -53,7 +53,7 @@ void analog_sample (ControllerStruct *controller){
 		controller->adc_c_raw = controller->ADC2_Val[1];
 	}
 
-    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)controller->ADC1_Val, 2);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)controller->ADC1_Val, 3);
     HAL_ADC_Start_DMA(&hadc2, (uint32_t *)controller->ADC2_Val, 2);
 
 	controller->adc_vbus_raw = controller->ADC1_Val[1];
