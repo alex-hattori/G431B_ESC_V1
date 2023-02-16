@@ -12,4 +12,4 @@
 ../Core/Src/foc.c:214:6:field_weaken	24	static
 ../Core/Src/foc.c:227:6:commutate	40	static
 ../Core/Src/foc.c:278:6:torque_control	24	static
-../Core/Src/foc.c:294:6:zero_commands	16	static
+../Core/Src/foc.c:288:6:zero_commands	16	static

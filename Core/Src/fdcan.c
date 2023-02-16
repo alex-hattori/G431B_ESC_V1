@@ -40,11 +40,11 @@ void MX_FDCAN1_Init(void)
 
   /* USER CODE END FDCAN1_Init 1 */
   hfdcan1.Instance = FDCAN1;
-  hfdcan1.Init.ClockDivider = FDCAN_CLOCK_DIV1;
+  hfdcan1.Init.ClockDivider = FDCAN_CLOCK_DIV4;
   hfdcan1.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
   hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
   hfdcan1.Init.AutoRetransmission = ENABLE;
-  hfdcan1.Init.TransmitPause = DISABLE;
+  hfdcan1.Init.TransmitPause = ENABLE;
   hfdcan1.Init.ProtocolException = DISABLE;
   hfdcan1.Init.NominalPrescaler = 3;
   hfdcan1.Init.NominalSyncJumpWidth = 1;
@@ -54,7 +54,7 @@ void MX_FDCAN1_Init(void)
   hfdcan1.Init.DataSyncJumpWidth = 1;
   hfdcan1.Init.DataTimeSeg1 = 1;
   hfdcan1.Init.DataTimeSeg2 = 1;
-  hfdcan1.Init.StdFiltersNbr = 0;
+  hfdcan1.Init.StdFiltersNbr = 1;
   hfdcan1.Init.ExtFiltersNbr = 0;
   hfdcan1.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
   if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK)
@@ -88,22 +88,17 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
     GPIO_InitStruct.Pin = GPIO_PIN_11;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = GPIO_PIN_9;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    __HAL_SYSCFG_FASTMODEPLUS_ENABLE(SYSCFG_FASTMODEPLUS_PB9);
-
-    /* FDCAN1 interrupt Init */
-    HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
   /* USER CODE BEGIN FDCAN1_MspInit 1 */
 
   /* USER CODE END FDCAN1_MspInit 1 */
@@ -129,8 +124,6 @@ void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* fdcanHandle)
 
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_9);
 
-    /* FDCAN1 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
   /* USER CODE BEGIN FDCAN1_MspDeInit 1 */
 
   /* USER CODE END FDCAN1_MspDeInit 1 */
@@ -139,22 +132,26 @@ void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* fdcanHandle)
 
 /* USER CODE BEGIN 1 */
 void can_rx_init(CANRxMessage *msg){
-//	msg->filter. FilterFIFOAssignment=CAN_FILTER_FIFO0; 	// set fifo assignment
-//	msg->filter.FilterIdHigh=CAN_ID<<5; 				// CAN ID
-//	msg->filter.FilterIdLow=0x0;
-//	msg->filter.FilterMaskIdHigh=0xFFF;
-//	msg->filter.FilterMaskIdLow=0;
-//	msg->filter.FilterMode = CAN_FILTERMODE_IDMASK;
-//	msg->filter.FilterScale=CAN_FILTERSCALE_32BIT;
-//	msg->filter.FilterActivation=ENABLE;
-//	HAL_FDCAN_ConfigFilter(&CAN_H, &msg->filter);
+	msg->filter.IdType = FDCAN_STANDARD_ID;
+	msg->filter.FilterIndex = 0;
+	msg->filter.FilterType = FDCAN_FILTER_RANGE;
+	msg->filter.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
+	msg->filter.FilterID1 = CAN_ID;
+	msg->filter.FilterID2 = CAN_ID;
+	HAL_FDCAN_ConfigFilter(&CAN_H, &msg->filter);
+	HAL_FDCAN_ConfigGlobalFilter(&CAN_H,3,3,0,1);
 }
 
 void can_tx_init(CANTxMessage *msg){
-//	msg->tx_header.DLC = 6; 			// message size of 8 byte
-//	msg->tx_header.IDE=CAN_ID_STD; 		// set identifier to standard
-//	msg->tx_header.RTR=CAN_RTR_DATA; 	// set data type to remote transmission request?
-//	msg->tx_header.StdId = CAN_MASTER;  // recipient CAN ID
+	msg->tx_header.Identifier = CAN_MASTER;
+	msg->tx_header.DataLength = FDCAN_DLC_BYTES_6;
+	msg->tx_header.IdType = FDCAN_STANDARD_ID;
+	msg->tx_header.TxFrameType = FDCAN_DATA_FRAME;
+	msg->tx_header.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+	msg->tx_header.BitRateSwitch = FDCAN_BRS_OFF;
+	msg->tx_header.FDFormat = FDCAN_CLASSIC_CAN;
+	msg->tx_header.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+	msg->tx_header.MessageMarker = 0;
 }
 
 /// CAN Reply Packet Structure ///
@@ -208,6 +205,7 @@ void unpack_cmd(CANRxMessage msg, float *commands){// ControllerStruct * control
         commands[2] = uint_to_float(kp_int, KP_MIN, KP_MAX, 12);
         commands[3] = uint_to_float(kd_int, KD_MIN, KD_MAX, 12);
         commands[4] = uint_to_float(t_int, -T_MAX, T_MAX, 12);
+
 //    printf("Received   ");
 //    printf("%.3f  %.3f  %.3f  %.3f  %.3f",commands[0], commands[1], commands[2], commands[3], commands[4]);
 //    printf("\n\r");

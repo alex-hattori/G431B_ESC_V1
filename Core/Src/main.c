@@ -190,9 +190,6 @@ if(EN_ENC_LINEARIZATION){memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(c
 else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
 
 /* Turn on ADCs */
-//   HAL_ADC_Start(&hadc1);
-//   HAL_Delay(10);
-//   HAL_ADC_Start(&hadc2);
 	HAL_OPAMP_Start(&hopamp1);
 	HAL_OPAMP_Start(&hopamp2);
 	HAL_OPAMP_Start(&hopamp3);
@@ -220,15 +217,16 @@ else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
       HAL_GPIO_WritePin(CAN_SHDWN, GPIO_PIN_RESET); //Enable CAN
       HAL_GPIO_WritePin(CAN_TERM, GPIO_PIN_RESET ); //Disable CAN termination resistor
 
-/*
+
 	  can_rx_init(&can_rx);
 	  can_tx_init(&can_tx);
-	  HAL_CAN_Start(&CAN_H); //start CAN
-	  __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING); // Start can interrupt  */
+
+	  HAL_FDCAN_Start(&CAN_H); //start CAN
+//	  HAL_FDCAN_ActivateNotification(&CAN_H,FDCAN_IT_RX_FIFO0_NEW_MESSAGE,0);
 
 	  /* Set Interrupt Priorities */
 	  NVIC_SetPriority(PWM_ISR, 1); // commutation > communication
-	  NVIC_SetPriority(CAN_ISR, 3);
+//	  NVIC_SetPriority(CAN_ISR, 3);
 
 	  /* Start the FSM */
 	  state.state = MENU_MODE;
@@ -237,7 +235,7 @@ else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
 
 
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
-   HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_Base_Start_IT(&htim1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -249,6 +247,7 @@ else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
     /* USER CODE BEGIN 3 */
 //	printf("A:%f B:%f C:%f V:%f \r\n",controller.i_a, controller.i_b, controller.i_c, controller.v_bus);
 //	  printf("%f %f\r\n",controller.i_q, controller.i_q_des);
+
 	HAL_Delay(100);
   }
   /* USER CODE END 3 */

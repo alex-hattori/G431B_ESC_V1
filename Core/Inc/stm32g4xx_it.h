@@ -58,11 +58,10 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 void DMA1_Channel1_IRQHandler(void);
 void DMA1_Channel2_IRQHandler(void);
-void FDCAN1_IT0_IRQHandler(void);
 void TIM1_UP_TIM16_IRQHandler(void);
 void USART2_IRQHandler(void);
 /* USER CODE BEGIN EFP */
-
+void can_tx_rx(void);
 /* USER CODE END EFP */
 
 #ifdef __cplusplus
