@@ -16,8 +16,12 @@ State Machine
 
 FOC (15khz)
 
-
-**Todo:**
-
 CAN
+
+
+**Next Steps**
+
+Increase loop frequency
+
+Mosfet temperature sense
 
