@@ -1,2 +1,2 @@
-../Core/Src/user_config.c:11:6:store_eeprom_regs	8	static
-../Core/Src/user_config.c:16:6:load_eeprom_regs	8	static
+user_config.c:11:6:store_eeprom_regs	8	static
+user_config.c:16:6:load_eeprom_regs	8	static

@@ -1,3 +1,3 @@
-../Core/Src/position_sensor.c:14:6:ps_warmup	40	static
-../Core/Src/position_sensor.c:31:6:ps_sample	56	static
-../Core/Src/position_sensor.c:84:6:ps_print	16	static
+position_sensor.c:14:6:ps_warmup	40	static
+position_sensor.c:31:6:ps_sample	56	static
+position_sensor.c:84:6:ps_print	16	static

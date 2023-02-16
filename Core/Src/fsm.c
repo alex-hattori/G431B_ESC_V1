@@ -49,7 +49,7 @@
 				 printf("E_ZERO: %d  PP: %.3f %f\r\n", E_ZERO, PPAIRS, TWO_PI_F*fmodf((PPAIRS*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
 				 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
 				 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
-				 //for(int i = 0; i<128; i++){printf("%d\r\n", ENCODER_LUT[i]);}
+				 //for(int i = 0; i<64; i++){printf("%d\r\n", ENCODER_LUT[i]);}
 				 store_eeprom_regs();
 				 load_eeprom_regs();
 				 update_fsm(fsmstate, 27);
@@ -206,11 +206,8 @@
 					fsmstate->ready = 0;
 					break;
 				case ZERO_CMD:
-					comm_encoder.m_zero = 0;
 					comm_encoder.mech_zero = 0.0f;
 					ps_sample(&comm_encoder, DT);
-//					int zero_count = comm_encoder.count;
-//					M_ZERO = zero_count;
 					MECH_ZERO = comm_encoder.angle_multiturn[0];
 					comm_encoder.mech_zero = MECH_ZERO;
 					store_eeprom_regs();

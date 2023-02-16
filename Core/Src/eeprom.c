@@ -60,7 +60,7 @@ HAL_StatusTypeDef eeprom_store(float const * float_regs, uint32_t float_size, in
 	// write the last page
 	{
 		uint64_t data = 0xDEADBEEF;
-		for(uint32_t index=0; index<float_size;index+=2) // 64 bits
+		for(uint32_t index=0; index<float_size;index+=2)
 		{
 			union UN {float a; uint32_t b;};
 			union UN un1;
@@ -82,7 +82,7 @@ HAL_StatusTypeDef eeprom_store(float const * float_regs, uint32_t float_size, in
 				return result;
 			}
 		}
-		for(uint32_t index=0; index<int_size;index+=2) // 64 bits
+		for(uint32_t index=0; index<int_size;index+=2)
 		{
 			union UN {int a; uint32_t b;};
 			union UN un1;

@@ -252,16 +252,11 @@ void TIM1_UP_TIM16_IRQHandler(void)
 	analog_sample(&controller);
 	/* Sample position sensor */
 	ps_sample(&comm_encoder, DT);
-//	  HAL_GPIO_WritePin(LoopTime, GPIO_PIN_SET );
-
 	/* Run Finite State Machine */
 	run_fsm(&state);
-
 	can_tx_rx();
-
 	/* increment loop count */
 	controller.loop_count++;
-
   /* USER CODE END TIM1_UP_TIM16_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM16_IRQn 1 */

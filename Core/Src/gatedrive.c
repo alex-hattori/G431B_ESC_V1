@@ -17,7 +17,6 @@ void enable_gd(ControllerStruct *controller){
     HAL_TIMEx_PWMN_Start(&TIM_PWM, TIM_CHANNEL_1);
     HAL_TIMEx_PWMN_Start(&TIM_PWM, TIM_CHANNEL_2);
     HAL_TIMEx_PWMN_Start(&TIM_PWM, TIM_CHANNEL_3);
-//    printf("enabled\r\n");
 }
 void disable_gd(ControllerStruct *controller){
 	//Drive all gates low

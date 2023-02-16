@@ -11,15 +11,6 @@
 
 /* ISRs */
 #define PWM_ISR			TIM1_UP_TIM16_IRQn	// PWM Timer ISR
-#define CAN_ISR			FDCAN1_IT0_IRQn		// CAN Receive ISR
-
-/* ADC */
-
-#define ADC_CH_MAIN		hadc1				// ADC channel handle which drives simultaneous mode
-#define ADC_CH_IA		hadc1					// Phase A current sense ADC channel handle.  0 = unused
-#define ADC_CH_IB		hadc2				// Phase B current sense ADC channel handle.  0 = unused
-#define ADC_CH_IC		0				// Phase C current sense ADC channel handle.  0 = unused
-#define ADC_CH_VBUS		hadc1				// Bus voltage ADC channel handle.  0 = unused
 
 #define ENC_I2C			hi2c1
 #define ENC_CPR			4096
@@ -52,9 +43,6 @@
 #define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
 /* Current controller */
-//#define K_SCALE 0.00005f             // K_loop/Loop BW (Hz) 0.0042
-//#define KI_D 0.009f                // PI zero, in radians per sample
-//#define KI_Q 0.009f                // PI zero, in radians per sample
 #define K_SCALE 0.0001f             // K_loop/Loop BW (Hz) 0.0042
 #define KI_D 0.045f                // PI zero, in radians per sample
 #define KI_Q 0.045f                // PI zero, in radians per sample
