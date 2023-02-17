@@ -20,9 +20,15 @@ CAN
 
 Mosfet temperature sense
 
+**Known Bugs**
+
+Seems to stutter around 0 position
+
+Has problems tracking current at high velocity
+
 
 **Next Steps**
 
-Increase loop frequency - Need to check actual loop frequency
+Increase loop frequency
 
 
