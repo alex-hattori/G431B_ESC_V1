@@ -35,11 +35,10 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	/* Shift around previous samples */
 	encoder->old_angle = encoder->angle_singleturn;
 //	for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
-	memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
+	memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float));
 
 	/* SPI read/write */
-	encoder->data.raw = 0;
-	HAL_I2C_Master_Receive(&ENC_I2C, ENC_ADDRESS,(uint8_t*)&encoder->data.raw, 2,2);
+	HAL_I2C_Master_Receive_DMA(&ENC_I2C, ENC_ADDRESS,(uint8_t*)&encoder->data.raw, 2);
 	uint16_t angle = ((encoder->data.bit.angle8_12<<8)&0xF00)|encoder->data.bit.angle0_7;
 	encoder->raw = angle;
 
