@@ -13,9 +13,13 @@
 #define PWM_ISR			TIM1_UP_TIM16_IRQn	// PWM Timer ISR
 
 #define ENC_I2C			hi2c1
-#define ENC_CPR			4096
+#define ENC_CPR			16384
 #define INV_CPR			1.0f/ENC_CPR
 #define ENC_ADDRESS		0x6C
+
+#define ENC_SPI_CLK		GPIOB, GPIO_PIN_6 //A = Clk - 1mhz PB6
+#define ENC_SPI_CS		GPIOB, GPIO_PIN_7 //B
+#define ENC_SPI_MISO	GPIOB, GPIO_PIN_8 //Z
 
 /* Misc. GPIO */
 #define LED         	GPIOC, GPIO_PIN_6	// LED Pin
@@ -43,9 +47,9 @@
 #define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
 /* Current controller */
-#define K_SCALE 0.00005f             // K_loop/Loop BW (Hz) 0.0042
-#define KI_D 0.025f                // PI zero, in radians per sample
-#define KI_Q 0.025f                // PI zero, in radians per sample
+#define K_SCALE 0.0001f             // K_loop/Loop BW (Hz) 0.0042
+#define KI_D 0.045f                // PI zero, in radians per sample
+#define KI_Q 0.045f                // PI zero, in radians per sample
 #define OVERMODULATION 1.15f        // 1.0 = no overmodulation
 #define CURRENT_FILT_ALPHA	.01f	// 1st order d/q current filter (not used in control)
 #define VBUS_FILT_ALPHA		.1f		// 1st order bus voltage filter

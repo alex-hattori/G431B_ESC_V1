@@ -22,7 +22,6 @@
 #include "adc.h"
 #include "dma.h"
 #include "fdcan.h"
-#include "i2c.h"
 #include "opamp.h"
 #include "tim.h"
 #include "usart.h"
@@ -124,7 +123,6 @@ int main(void)
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
-  MX_I2C1_Init();
   MX_OPAMP1_Init();
   MX_OPAMP2_Init();
   MX_OPAMP3_Init();
@@ -209,6 +207,11 @@ int main(void)
 	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
 	HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
 
+//	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+//	htim4.Instance->CCR1 = ((htim4.Instance->ARR))*(0.5f);
+	HAL_GPIO_WritePin(ENC_SPI_CLK, GPIO_PIN_SET); //CS High
+	HAL_GPIO_WritePin(ENC_SPI_CS, GPIO_PIN_SET); //CS High
+
 	disable_gd(&controller);
 
 	/* CAN setup */
@@ -252,9 +255,9 @@ int main(void)
 //		float const present_temperature_K = Beta * T0 / ( Beta - T0*logf(R0/R_NTC) );
 //		controller.fet_temp_C = present_temperature_K-Kelvin;
 //		printf("%f\r\n",controller.fet_temp_C);
-	  if(controller.isEnabled){
-	  printf("%.3f %.3f %.3f %.3f %.3f\r\n", controller.p_des, controller.theta_mech, controller.dtheta_mech, controller.i_q_des, controller.i_q);
-	  }
+//	  if(controller.isEnabled){
+//	  printf("%.3f %.3f %.3f %.3f %.3f\r\n", controller.p_des, controller.theta_mech, controller.dtheta_mech, controller.i_q_des, controller.i_q);
+//	  }
 //		HAL_Delay(10);
   }
   /* USER CODE END 3 */
@@ -304,10 +307,9 @@ void SystemClock_Config(void)
   }
   /** Initializes the peripherals clocks
   */
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_ADC12|RCC_PERIPHCLK_FDCAN;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_ADC12
+                              |RCC_PERIPHCLK_FDCAN;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PCLK1;
   PeriphClkInit.Adc12ClockSelection = RCC_ADC12CLKSOURCE_SYSCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)

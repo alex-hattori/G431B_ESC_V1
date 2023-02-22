@@ -232,10 +232,6 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 		controller->dtheta_mech = encoder->velocity/GR;
 		controller->theta_mech = encoder->angle_multiturn[0]/GR;
 
-	       if(fabsf(controller->dtheta_mech)>30){
-	    	   controller->i_q_des = 0.0f;
-	       }
-
        /// Commutation  ///
        dq0(controller->theta_elec, controller->i_a, controller->i_b, controller->i_c, &controller->i_d, &controller->i_q);    //dq0 transform on currents - 3.8 us
 
