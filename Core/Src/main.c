@@ -252,9 +252,9 @@ int main(void)
 //		float const present_temperature_K = Beta * T0 / ( Beta - T0*logf(R0/R_NTC) );
 //		controller.fet_temp_C = present_temperature_K-Kelvin;
 //		printf("%f\r\n",controller.fet_temp_C);
-	  if(controller.isEnabled){
-	  printf("%.3f %.3f %.3f %.3f %.3f\r\n", controller.p_des, controller.theta_mech, controller.dtheta_mech, controller.i_q_des, controller.i_q);
-	  }
+//	  if(controller.isEnabled){
+//	  printf("%.3f %.3f %.3f %.3f %.3f\r\n", controller.p_des, controller.theta_mech, controller.dtheta_mech, controller.i_q_des, controller.i_q);
+//	  }
 //		HAL_Delay(10);
   }
   /* USER CODE END 3 */
