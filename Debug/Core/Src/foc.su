@@ -11,5 +11,5 @@
 ../Core/Src/foc.c:204:7:linearize_dtc	32	static
 ../Core/Src/foc.c:213:6:field_weaken	24	static
 ../Core/Src/foc.c:226:6:commutate	40	static
-../Core/Src/foc.c:277:6:torque_control	24	static
-../Core/Src/foc.c:287:6:zero_commands	16	static
+../Core/Src/foc.c:281:6:torque_control	24	static
+../Core/Src/foc.c:291:6:zero_commands	16	static
