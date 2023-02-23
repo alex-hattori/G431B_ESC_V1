@@ -258,7 +258,8 @@ int main(void)
 //	  if(controller.isEnabled){
 //	  printf("%.3f %.3f %.3f %.3f %.3f\r\n", controller.p_des, controller.theta_mech, controller.dtheta_mech, controller.i_q_des, controller.i_q);
 //	  }
-//		HAL_Delay(10);
+	  HAL_Delay(10);
+	  printf("%d\r\n",comm_encoder.raw);
   }
   /* USER CODE END 3 */
 }

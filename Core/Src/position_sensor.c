@@ -10,6 +10,7 @@
 #include "math_ops.h"
 #include "hw_config.h"
 #include "user_config.h"
+#include "gpio.h"
 
 void ps_warmup(EncoderStruct * encoder, int n){
 //	encoder->config.raw = 0;
@@ -37,15 +38,13 @@ void ps_sample(EncoderStruct * encoder, float dt){
 //	for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
 	memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float));
 
-	/* SPI read/write */
-//	if(HAL_I2C_GetState(&ENC_I2C)==HAL_I2C_STATE_READY)
-//		HAL_I2C_Master_Receive_DMA(&ENC_I2C, ENC_ADDRESS,(uint8_t*)&encoder->data.raw, 2);
-//	uint16_t angle = ((encoder->data.bit.angle8_12<<8)&0xF00)|encoder->data.bit.angle0_7;
-	HAL_GPIO_WritePin(ENC_SPI_CLK, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(ENC_SPI_CS, GPIO_PIN_REET); //CS Low
-	HAL_GPIO_WritePin(ENC_SPI_CLK, GPIO_PIN_RESET);
+	/* SPI read */
+	HAL_GPIO_WritePin(ENC_SPI_CS, GPIO_PIN_RESET); //CS Low
+	for(int i = 0; i<5; i++){
+		//delay for CS falling edge -> clk rising edge requirement
+	}
 	uint16_t spi_val;
-	int index = 13;
+	int index = 16;
 	//MSB first
 	//Read on rising edge
 	//Takes 50ns
@@ -59,7 +58,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	}
 	HAL_GPIO_WritePin(ENC_SPI_CS, GPIO_PIN_SET); //CS High
 
-	encoder->raw = spi_val; //angle;
+	encoder->raw = spi_val&0x3FFF; //angle;
 
 	/* Linearization */
 	int off_1 = encoder->offset_lut[(encoder->raw)>>7];				// lookup table lower entry
