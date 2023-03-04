@@ -12,10 +12,9 @@
 /* ISRs */
 #define PWM_ISR			TIM1_UP_TIM16_IRQn	// PWM Timer ISR
 
-#define ENC_I2C			hi2c1
 #define ENC_CPR			4096
 #define INV_CPR			1.0f/ENC_CPR
-#define ENC_ADDRESS		0x6C
+#define ENC_TIM			htim2
 
 /* Misc. GPIO */
 #define LED         	GPIOC, GPIO_PIN_6	// LED Pin

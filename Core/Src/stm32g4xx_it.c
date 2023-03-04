@@ -30,7 +30,6 @@
 #include "hw_config.h"
 #include "structs.h"
 #include "fsm.h"
-#include "i2c.h"
 #include "adc.h"
 #include "foc.h"
 #include "fdcan.h"
@@ -70,9 +69,8 @@
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_adc1;
 extern DMA_HandleTypeDef hdma_adc2;
-extern DMA_HandleTypeDef hdma_i2c1_rx;
-extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 
@@ -245,20 +243,6 @@ void DMA1_Channel2_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles DMA1 channel3 global interrupt.
-  */
-void DMA1_Channel3_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel3_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
-  /* USER CODE BEGIN DMA1_Channel3_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel3_IRQn 1 */
-}
-
-/**
   * @brief This function handles TIM1 update interrupt and TIM16 global interrupt.
   */
 void TIM1_UP_TIM16_IRQHandler(void)
@@ -267,7 +251,7 @@ void TIM1_UP_TIM16_IRQHandler(void)
 	HAL_GPIO_WritePin(PWM_PIN, GPIO_PIN_SET );	// Useful for timing
 	analog_sample(&controller); //19us
 	/* Sample position sensor */
-	ps_sample(&comm_encoder, DT);
+//	ps_sample(&comm_encoder, DT);
 	/* Run Finite State Machine */
 	run_fsm(&state);
 	can_tx_rx();
@@ -281,17 +265,17 @@ void TIM1_UP_TIM16_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles I2C1 event interrupt / I2C1 wake-up interrupt through EXTI line 23.
+  * @brief This function handles TIM2 global interrupt.
   */
-void I2C1_EV_IRQHandler(void)
+void TIM2_IRQHandler(void)
 {
-  /* USER CODE BEGIN I2C1_EV_IRQn 0 */
+  /* USER CODE BEGIN TIM2_IRQn 0 */
 
-  /* USER CODE END I2C1_EV_IRQn 0 */
-  HAL_I2C_EV_IRQHandler(&hi2c1);
-  /* USER CODE BEGIN I2C1_EV_IRQn 1 */
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
 
-  /* USER CODE END I2C1_EV_IRQn 1 */
+  /* USER CODE END TIM2_IRQn 1 */
 }
 
 /**
@@ -332,6 +316,12 @@ void can_tx_rx(void){
 		  controller.timeout = 0;					// Reset timeout counter
 	  }
 	}
+}
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim){
+//	printf("TIMER\r\n");
+	float const init_error_data_bits = 4119.0f*(float)__HAL_TIM_GET_COMPARE(&ENC_TIM,TIM_CHANNEL_2)/(float)__HAL_TIM_GET_COMPARE(&ENC_TIM,TIM_CHANNEL_1);
+	comm_encoder.raw = (int)(init_error_data_bits);
+	ps_sample(&comm_encoder, 0.001f);
 }
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

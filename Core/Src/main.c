@@ -22,7 +22,6 @@
 #include "adc.h"
 #include "dma.h"
 #include "fdcan.h"
-#include "i2c.h"
 #include "opamp.h"
 #include "tim.h"
 #include "usart.h"
@@ -124,13 +123,14 @@ int main(void)
   MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
-  MX_I2C1_Init();
   MX_OPAMP1_Init();
   MX_OPAMP2_Init();
   MX_OPAMP3_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_FDCAN1_Init();
+  MX_TIM2_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 	load_eeprom_regs();
 	/* Sanitize configs in case flash is empty*/
@@ -168,10 +168,14 @@ int main(void)
 	comm_encoder.e_zero = E_ZERO;
 	comm_encoder.ppairs = PPAIRS;
 	comm_encoder.mech_zero = MECH_ZERO;
-	ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
-	ps_sample(&comm_encoder, DT);
-	ps_sample(&comm_encoder, DT);
-	ps_sample(&comm_encoder, DT);
+//	ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
+//	ps_sample(&comm_encoder, DT);
+//	ps_sample(&comm_encoder, DT);
+//	ps_sample(&comm_encoder, DT);
+	HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
+	HAL_TIM_IC_Start(&htim2, TIM_CHANNEL_2);
+	HAL_Delay(5);
+
 	if(comm_encoder.angle_multiturn[0]>PI_F){
 	comm_encoder.angle_multiturn[0]-=TWO_PI_F;
 	comm_encoder.turns--;
@@ -304,10 +308,9 @@ void SystemClock_Config(void)
   }
   /** Initializes the peripherals clocks
   */
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_ADC12|RCC_PERIPHCLK_FDCAN;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_ADC12
+                              |RCC_PERIPHCLK_FDCAN;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
-  PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.FdcanClockSelection = RCC_FDCANCLKSOURCE_PCLK1;
   PeriphClkInit.Adc12ClockSelection = RCC_ADC12CLKSOURCE_SYSCLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)

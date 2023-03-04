@@ -27,8 +27,6 @@ Core/Src/gatedrive.o: ../Core/Src/gatedrive.c ../Core/Inc/gatedrive.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h \
- ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c.h \
- ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h \
@@ -37,10 +35,9 @@ Core/Src/gatedrive.o: ../Core/Src/gatedrive.c ../Core/Inc/gatedrive.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../Core/Inc/hw_config.h ../Core/Inc/structs.h ../Core/Inc/i2c.h \
- ../Core/Inc/gpio.h ../Core/Inc/adc.h ../Core/Inc/position_sensor.h \
- ../Core/Inc/fsm.h ../Core/Inc/foc.h ../Core/Inc/calibration.h \
- ../Core/Inc/fdcan.h
+ ../Core/Inc/hw_config.h ../Core/Inc/structs.h ../Core/Inc/gpio.h \
+ ../Core/Inc/adc.h ../Core/Inc/position_sensor.h ../Core/Inc/fsm.h \
+ ../Core/Inc/foc.h ../Core/Inc/calibration.h ../Core/Inc/fdcan.h
 ../Core/Inc/gatedrive.h:
 ../Core/Inc/tim.h:
 ../Core/Inc/main.h:
@@ -71,8 +68,6 @@ Core/Src/gatedrive.o: ../Core/Src/gatedrive.c ../Core/Inc/gatedrive.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h:
-../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c.h:
-../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h:
@@ -83,7 +78,6 @@ Core/Src/gatedrive.o: ../Core/Src/gatedrive.c ../Core/Inc/gatedrive.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
 ../Core/Inc/hw_config.h:
 ../Core/Inc/structs.h:
-../Core/Inc/i2c.h:
 ../Core/Inc/gpio.h:
 ../Core/Inc/adc.h:
 ../Core/Inc/position_sensor.h:
