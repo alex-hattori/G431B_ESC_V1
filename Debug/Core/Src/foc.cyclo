@@ -1,0 +1,15 @@
+foc.c:16:6:set_dtc	2
+foc.c:42:6:analog_sample	2
+foc.c:67:6:abc	1
+foc.c:81:6:dq0	1
+foc.c:94:6:svm	1
+foc.c:107:6:zero_current	2
+foc.c:131:6:init_controller_params	2
+foc.c:146:6:reset_foc	1
+foc.c:164:6:reset_observer	1
+foc.c:172:6:update_observer	1
+foc.c:204:7:linearize_dtc	1
+foc.c:213:6:field_weaken	1
+foc.c:226:6:commutate	1
+foc.c:277:6:torque_control	1
+foc.c:287:6:zero_commands	1

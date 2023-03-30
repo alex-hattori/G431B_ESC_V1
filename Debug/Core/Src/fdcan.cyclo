@@ -1,0 +1,7 @@
+fdcan.c:32:6:MX_FDCAN1_Init	2
+fdcan.c:70:6:HAL_FDCAN_MspInit	2
+fdcan.c:108:6:HAL_FDCAN_MspDeInit	2
+fdcan.c:134:6:can_rx_init	1
+fdcan.c:145:6:can_tx_init	1
+fdcan.c:168:6:pack_reply	1
+fdcan.c:196:6:unpack_cmd	1

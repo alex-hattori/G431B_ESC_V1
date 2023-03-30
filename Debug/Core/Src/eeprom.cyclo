@@ -1,0 +1,2 @@
+eeprom.c:14:19:eeprom_restore	3
+eeprom.c:46:19:eeprom_store	8

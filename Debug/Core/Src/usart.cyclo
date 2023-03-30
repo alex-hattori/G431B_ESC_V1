@@ -1,0 +1,5 @@
+usart.c:31:6:MX_USART2_UART_Init	5
+usart.c:74:6:HAL_UART_MspInit	2
+usart.c:107:6:HAL_UART_MspDeInit	2
+usart.c:133:5:__io_putchar	1
+usart.c:138:6:HAL_UART_RxCpltCallback	1

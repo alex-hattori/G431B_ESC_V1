@@ -39,12 +39,13 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float));
 
 	/* SPI read */
+	HAL_GPIO_WritePin(ENC_SPI_CLK, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(ENC_SPI_CS, GPIO_PIN_RESET); //CS Low
 	for(int i = 0; i<5; i++){
 		//delay for CS falling edge -> clk rising edge requirement
 	}
 	uint16_t spi_val;
-	int index = 16;
+	int index = 15;
 	//MSB first
 	//Read on rising edge
 	//Takes 50ns
