@@ -13,20 +13,29 @@
 #include "gpio.h"
 
 void ps_warmup(EncoderStruct * encoder, int n){
-//	encoder->config.raw = 0;
-//	encoder->config.bit.PM = 0;
-//	encoder->config.bit.HYST = 0;
-//	encoder->config.bit.OUTS = 0;
-//	encoder->config.bit.PWMF = 0;
-//	encoder->config.bit.SF = 3;
-//	encoder->config.bit.FTH = 7;
-//	encoder->config.bit.WD = 0;
-//	HAL_I2C_Mem_Write(&ENC_I2C, ENC_ADDRESS,0x01,I2C_MEMADD_SIZE_8BIT, (uint8_t*)&encoder->config.raw, 2,2);
-//	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
-//	for(int i = 0; i<n; i++){
-//		encoder->data.raw = 0;
-//		HAL_I2C_Mem_Read(&ENC_I2C, ENC_ADDRESS,0x0C,I2C_MEMADD_SIZE_8BIT,(uint8_t*)&encoder->data.raw, 2,2);
-//	}
+	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
+	for(int i = 0; i<n; i++){
+		/* SPI read */
+		HAL_GPIO_WritePin(ENC_SPI_CLK, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(ENC_SPI_CS, GPIO_PIN_RESET); //CS Low
+		for(int i = 0; i<5; i++){
+			//delay for CS falling edge -> clk rising edge requirement
+		}
+		uint16_t spi_val;
+		int index = 15;
+		//MSB first
+		//Read on rising edge
+		//Takes 50ns
+		while(index>=0){
+			HAL_GPIO_WritePin(ENC_SPI_CLK, GPIO_PIN_SET);
+			if(HAL_GPIO_ReadPin(ENC_SPI_MISO)){
+				spi_val |= 1<<index;
+			}
+			index--;
+			HAL_GPIO_WritePin(ENC_SPI_CLK, GPIO_PIN_RESET);
+		}
+		HAL_GPIO_WritePin(ENC_SPI_CS, GPIO_PIN_SET); //CS High
+	}
 }
 
 void ps_sample(EncoderStruct * encoder, float dt){

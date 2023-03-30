@@ -43,8 +43,8 @@
 #define DTC_MAX 			0.94f          	// Max duty cycle
 #define DTC_MIN 			0.0f          	// Min duty cycle
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
-#define DT					0.00006666666f		// Loop period
-#define EN_ENC_LINEARIZATION 0				// Enable/disable encoder linearization
+#define DT					0.0001f		// Loop period
+#define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
 /* Current controller */
 #define K_SCALE 0.0001f             // K_loop/Loop BW (Hz) 0.0042
