@@ -10,7 +10,6 @@
 
 
 //#include "structs.h"
-#include "i2c.h"
 #include <stdint.h>
 
 #define N_POS_SAMPLES 20		// Number of position samples to store.  should put this somewhere else...

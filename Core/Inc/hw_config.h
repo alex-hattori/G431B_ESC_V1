@@ -13,9 +13,13 @@
 #define PWM_ISR			TIM1_UP_TIM16_IRQn	// PWM Timer ISR
 
 #define ENC_I2C			hi2c1
-#define ENC_CPR			4096
+#define ENC_CPR			16384
 #define INV_CPR			1.0f/ENC_CPR
 #define ENC_ADDRESS		0x6C
+
+#define ENC_SPI_CLK		GPIOB, GPIO_PIN_6 //A = Clk - 1mhz PB6
+#define ENC_SPI_CS		GPIOB, GPIO_PIN_7 //B
+#define ENC_SPI_MISO	GPIOB, GPIO_PIN_8 //Z
 
 /* Misc. GPIO */
 #define LED         	GPIOC, GPIO_PIN_6	// LED Pin
@@ -40,7 +44,7 @@
 #define DTC_MIN 			0.0f          	// Min duty cycle
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
 #define DT					0.00006666666f		// Loop period
-#define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
+#define EN_ENC_LINEARIZATION 0				// Enable/disable encoder linearization
 
 /* Current controller */
 #define K_SCALE 0.0001f             // K_loop/Loop BW (Hz) 0.0042

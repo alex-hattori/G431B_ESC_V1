@@ -1,5 +1,5 @@
 Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h \
- ../Core/Inc/position_sensor.h ../Core/Inc/i2c.h ../Core/Inc/main.h \
+ ../Core/Inc/position_sensor.h ../Core/Inc/adc.h ../Core/Inc/main.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h \
  ../Core/Inc/stm32g4xx_hal_conf.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_rcc.h \
@@ -27,8 +27,6 @@ Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h \
- ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c.h \
- ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h \
@@ -37,11 +35,11 @@ Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
- ../Core/Inc/adc.h ../Core/Inc/tim.h ../Core/Inc/position_sensor.h \
- ../Core/Inc/math_ops.h ../Core/Inc/hw_config.h ../Core/Inc/user_config.h
+ ../Core/Inc/tim.h ../Core/Inc/position_sensor.h ../Core/Inc/math_ops.h \
+ ../Core/Inc/hw_config.h ../Core/Inc/user_config.h
 ../Core/Inc/foc.h:
 ../Core/Inc/position_sensor.h:
-../Core/Inc/i2c.h:
+../Core/Inc/adc.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
 ../Core/Inc/stm32g4xx_hal_conf.h:
@@ -70,8 +68,6 @@ Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_flash_ramfunc.h:
-../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c.h:
-../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_i2c_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_opamp_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_pwr.h:
@@ -80,7 +76,6 @@ Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h \
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_tim_ex.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h:
-../Core/Inc/adc.h:
 ../Core/Inc/tim.h:
 ../Core/Inc/position_sensor.h:
 ../Core/Inc/math_ops.h:
