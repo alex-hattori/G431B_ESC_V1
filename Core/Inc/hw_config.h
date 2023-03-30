@@ -43,9 +43,9 @@
 #define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
 /* Current controller */
-#define K_SCALE 0.00005f             // K_loop/Loop BW (Hz) 0.0042
-#define KI_D 0.025f                // PI zero, in radians per sample
-#define KI_Q 0.025f                // PI zero, in radians per sample
+#define K_SCALE 0.0001f             // K_loop/Loop BW (Hz) 0.0042
+#define KI_D 0.045f                // PI zero, in radians per sample
+#define KI_Q 0.045f                // PI zero, in radians per sample
 #define OVERMODULATION 1.15f        // 1.0 = no overmodulation
 #define CURRENT_FILT_ALPHA	.01f	// 1st order d/q current filter (not used in control)
 #define VBUS_FILT_ALPHA		.1f		// 1st order bus voltage filter
