@@ -12,7 +12,7 @@
 //#include "structs.h"
 #include <stdint.h>
 
-#define N_POS_SAMPLES 15		// Number of position samples to store.  should put this somewhere else...
+#define N_POS_SAMPLES 20		// Number of position samples to store.  should put this somewhere else...
 #define N_LUT 64
 
 typedef union
