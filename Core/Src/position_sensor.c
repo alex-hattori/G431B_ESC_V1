@@ -71,9 +71,9 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->raw = spi_val&0x3FFF; //angle;
 
 	/* Linearization */
-	int off_1 = encoder->offset_lut[(encoder->raw)>>7];				// lookup table lower entry
-	int off_2 = encoder->offset_lut[((encoder->raw>>7)+1)%128];		// lookup table higher entry
-	int off_interp = off_1 + ((off_2 - off_1)*(encoder->raw - ((encoder->raw>>7)<<7))>>7);     // Interpolate between lookup table entries
+	int off_1 = encoder->offset_lut[(encoder->raw)>>8];				// lookup table lower entry
+	int off_2 = encoder->offset_lut[((encoder->raw>>8)+1)%64];		// lookup table higher entry
+	int off_interp = off_1 + ((off_2 - off_1)*(encoder->raw - ((encoder->raw>>8)<<8))>>8);     // Interpolate between lookup table entries
 	encoder->count = encoder->raw - off_interp;
 
 
